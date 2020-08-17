@@ -6,8 +6,12 @@
 package edu.eci.arsw.blacklistvalidator;
 
 import edu.eci.arsw.spamkeywordsdatasource.HostBlacklistsDataSourceFacade;
+import edu.eci.arsw.threads.SearchThread;
+
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,22 +34,15 @@ public class HostBlackListsValidator {
      * @return  Blacklists numbers where the given host's IP address was found.
      */
     public List<Integer> checkHost(String ipaddress){
-        
         LinkedList<Integer> blackListOcurrences=new LinkedList<>();
-        
         int ocurrencesCount=0;
-        
         HostBlacklistsDataSourceFacade skds=HostBlacklistsDataSourceFacade.getInstance();
-        
         int checkedListsCount=0;
         
         for (int i=0;i<skds.getRegisteredServersCount() && ocurrencesCount<BLACK_LIST_ALARM_COUNT;i++){
             checkedListsCount++;
-            
             if (skds.isInBlackListServer(i, ipaddress)){
-                
                 blackListOcurrences.add(i);
-                
                 ocurrencesCount++;
             }
         }
@@ -55,16 +52,44 @@ public class HostBlackListsValidator {
         }
         else{
             skds.reportAsTrustworthy(ipaddress);
-        }                
-        
+        }
         LOG.log(Level.INFO, "Checked Black Lists:{0} of {1}", new Object[]{checkedListsCount, skds.getRegisteredServersCount()});
-        
         return blackListOcurrences;
     }
-    
-    
+
     private static final Logger LOG = Logger.getLogger(HostBlackListsValidator.class.getName());
-    
-    
-    
+
+    public List<Integer> checkHost(String ipaddress, int N){
+        LinkedList<Integer> blackListOcurrences = new LinkedList<>();
+        AtomicInteger ocurrencesCount = new AtomicInteger();
+        HostBlacklistsDataSourceFacade facade = HostBlacklistsDataSourceFacade.getInstance();
+        AtomicInteger checkedListsCount = new AtomicInteger();
+        ArrayList<SearchThread> searchThreads= new ArrayList<>();
+        int start = 1;
+        int clusterSize = facade.getRegisteredServersCount()/N;
+        for (int i = 0; i < N; i++) {
+            if(i == N - 1){
+                searchThreads.add(new SearchThread(ipaddress, start, clusterSize + (facade.getRegisteredServersCount() % N), facade, checkedListsCount, ocurrencesCount, BLACK_LIST_ALARM_COUNT, blackListOcurrences));
+            } else {
+                searchThreads.add(new SearchThread(ipaddress, start, clusterSize,facade, checkedListsCount, ocurrencesCount, BLACK_LIST_ALARM_COUNT, blackListOcurrences));
+            }
+            start += clusterSize;
+        }
+        searchThreads.forEach(Thread::start);
+        searchThreads.forEach(  t -> {
+                        try{
+                            t.join();
+                        }catch (InterruptedException e){
+                            e.printStackTrace();
+                        }
+                    });
+        if(ocurrencesCount.get() >= BLACK_LIST_ALARM_COUNT){
+            facade.reportAsNotTrustworthy(ipaddress);
+        }else {
+            facade.reportAsTrustworthy(ipaddress);
+        }
+        LOG.log(Level.INFO, "Checked Black Lists:{0} of {1}", new Object[]{checkedListsCount.get(), facade.getRegisteredServersCount()});
+        return blackListOcurrences;
+    }
+
 }
