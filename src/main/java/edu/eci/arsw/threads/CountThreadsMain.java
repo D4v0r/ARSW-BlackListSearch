@@ -19,10 +19,16 @@ public class CountThreadsMain {
         Thread threadThree = new Thread(new CountThread(200, 299));
 
 
+        //Run
+//        threadOne.run();
+//        threadOne.run();
+//        threadOne.run();
+
         //Start
         threadOne.start();
         threadTwo.start();
         threadThree.start();
+
     }
     
 }
