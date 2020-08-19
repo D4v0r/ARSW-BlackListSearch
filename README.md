@@ -11,7 +11,7 @@ Cuando iniciamos con `run()` únicamente se ejecuta ese método dentro del hilo 
 
 Modelo Inicial
 
-![](img/model.png)
+![](img/Model.png)
 
 
 Ejecución despues de los cambios
