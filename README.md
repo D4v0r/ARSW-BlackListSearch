@@ -10,11 +10,11 @@ Cuando iniciamos con `run()` únicamente se ejecuta ese método dentro del hilo 
 ## Part ll - Black List Search Exercise
 
 Modelo Inicial
-![Model](/img/model.png)
+![Model](img/model.png)
 
 
 Ejecución despues de los cambios
-![](/img/blistrun.PNG)
+![](img/blistrun.PNG)
 
 
 ## Part lll - Discussion
@@ -33,15 +33,15 @@ Trae consigo problemas de sincronización porque debemos garantizar que los hilo
 ![](img/unHiloVisual.png)
 
 + Un único Thread.
-![](img/1hilo.png)
+![](img/1hilo.PNG)
 + Tantos hilos como el núcleo de procesamiento.
-![](img/12hilos.png)
+![](img/12hilos.PNG)
 + Tantos hilos como el doble del número de núcleos de procesamiento.
-![](img/24hilos.png)
+![](img/24hilos.PNG)
 + 50 hilos.
-![](img/50hilos.png)
+![](img/50hilos.PNG)
 + 100 hilos.
-![](img/100hilos.png)
+![](img/100hilos.PNG)
 
 ## Gráfica
 
