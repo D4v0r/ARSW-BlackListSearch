@@ -11,7 +11,7 @@ Cuando iniciamos con `run()` únicamente se ejecuta ese método dentro del hilo 
 
 Modelo Inicial
 
-![Model](img/model.png)
+![](img/model.png)
 
 
 Ejecución despues de los cambios
@@ -55,6 +55,7 @@ Trae consigo problemas de sincronización porque debemos garantizar que los hilo
 
 
 + 100 hilos.
+
 ![](img/100hilos.PNG)
 
 
